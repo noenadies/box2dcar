@@ -49,6 +49,9 @@ z-index: 2;
 var vh = window.innerHeight;    
 var game = new Phaser.Game(vw, vh, Phaser.CANVAS, 'phaser-example', { preload: preload,create: create, update: update, render: render });
 var dm=100;
+
+
+var wheelBodies = [];
 var groundVertices =
 
 [-2492,-15,631,-4,828,-228,];
@@ -58,6 +61,9 @@ var truckVertices = [-0.941074,-7.13798,-69.9798,-7.91197,-73.1929,8.39935,-68.3
 59.8766,3.8326,67.2056,10.2159,71.7627,9.80711,72.9977,1.35024,69.3556,-5.51562,
 34.5293,-7.36343,21.802,-21.4563,1.15879,-21.9506];
 
+var truckBody;
+var driveJoints = [];
+
 var otro=
 
 [-73.9998779296875,9.16650390625,68.0001220703125,-16.83349609375,75.0001220703125,-0.83349609375,63.0001220703125,-3.83349609375,45.0001220703125,-4.83349609375,39.0001220703125,7.16650390625,12.0001220703125,15.16650390625,-18.9998779296875,19.16650390625,-29.9998779296875,11.16650390625,-39.9998779296875,11.16650390625,-55.9998779296875,16.16650390625,-58.9998779296875,26.16650390625,-70.9998779296875,23.16650390625,];
@@ -66,14 +72,13 @@ function te(st){
 document.getElementById("idtext").innerHTML =st;
 }
 
-var truckBody;
-var driveJoints = [];
 
 
 function preload() {
 
-    game.load.image('btcd', 'cd.png');    game.load.image('tire', 'tire.png');
- game.load.image('truck', 'truck.png');
+    game.load.image('btcd', 'cd.png');    game.load.image('rd', 'rd.png');
+     game.load.image('tire', 'tire.png');
+ game.load.image('truck', 'mc.png');
 
  game.load.image('suelo','suelo.png');
 
@@ -86,13 +91,14 @@ function preload() {
 
 function  hacerbody(sp,fo){
 sp.anchor.set(0.5);
-sp.scale.set(0.53);
+sp.scale.set(1);
 game.physics.box2d.enable(sp);
 sp.body.setPolygon(fo);
 return sp;
 }
 
-
+var ri;
+var rd;
 function create() {
 	
 	game.world.setBounds(-10000, -10000, 20000, 20000);
@@ -101,21 +107,15 @@ function create() {
 
 	// Enable Box2D physics
 	game.physics.startSystem(Phaser.Physics.BOX2D);
-
 	game.physics.box2d.gravity.y = 500;
 	game.physics.box2d.friction = 0.8;
 	
-	
 	// Make the ground body
-	//var groundBody = new Phaser.Physics.Box2D.Body(this.game, null, 0, 200, 0);
+	//var groundBody = new Phaser.Physics.Box2D.Body(this.game, null, 0, 0, 0);
 	//groundBody.setChain(groundVertices);
-	
-	var PTM = 50;
-	
-	// Make the truck body
-	//truckBody = new Phaser.Physics.Box2D.Body(this.game, null, 0, -1*PTM);
-	//truckBody.setPolygon(truckVertices);
-		
+
+
+
 suelo = game.add.sprite(55, 300, 'suelo');
 suelo.anchor.set(0.5);
 
@@ -124,23 +124,48 @@ suelo.scale.set(1,0.2);
 game.physics.box2d.enable(suelo);
 //suelo.body.setPolygon(groundVertices);
 suelo.body.static = true;
-truckBody = game.add.sprite(49, 0, 'truck');
-/*truckBody.scale.set(0.53);
-game.physics.box2d.enable(truckBody);
-truckBody.body.setPolygon(otro);*/
 
 
 
-hacerbody(truckBody,otro);
+
+
+
+
+
+	
+	var PTM = 50;
+	
+	// Make the truck body
+	truckBody = new Phaser.Physics.Box2D.Body(this.game, null, 0, -90);
+	truckBody.setPolygon(truckVertices);
+
+	truckBody.sprite=game.add.sprite(9, -44, 'truck');
+		
+	truckBody.sprite.anchor.set(0.5);
+
 	// Make the wheel bodies
 	var wheelBodies = [];
-	wheelBodies[0] = new Phaser.Physics.Box2D.Body(this.game, null, -0.82*PTM, 0.6*-PTM);
-	wheelBodies[1] = new Phaser.Physics.Box2D.Body(this.game, null,  1.05*PTM, 0.6*-PTM);
-	wheelBodies[0].setCircle(0.3*PTM);
-	wheelBodies[1].setCircle(0.3*PTM);
-		wheelBodies[0].sprite =game.add.sprite(0, 0, 'tire');
-			wheelBodies[1].sprite=game.add.sprite(0, 30, 'tire');
-			wheelBodies[1].sprite.scale.set(0,46);wheelBodies[0].sprite.scale.set(0,46);
+	ri = new Phaser.Physics.Box2D.Body(this.game, null,0, -44);
+	rd = new Phaser.Physics.Box2D.Body(this.game, true,  0,-44);
+
+
+	ri.setCircle(0.3*PTM);
+
+	ri.sprite=game.add.sprite(49, -22, 'rd');
+ri.sprite.anchor.set(0.5);
+ri.sprite.body=ri;
+
+
+
+	rd.setCircle(0.3*PTM);
+	
+	rd.sprite=game.add.sprite(49, -22, 'rd');
+rd.sprite.anchor.set(0.5);
+rd.sprite.body=rd;
+
+
+
+	console.log( ri);
 	var frequency = 3.5;
 	var damping = 0.5;	
 	var motorTorque = 2;
@@ -148,8 +173,8 @@ hacerbody(truckBody,otro);
 	
 	// Make wheel joints
 	// bodyA, bodyB, ax, ay, bx, by, axisX, axisY, frequency, damping, motorSpeed, motorTorque, motorEnabled	
-	driveJoints[0] = game.physics.box2d.wheelJoint(truckBody.body, wheelBodies[0], -0.82*PTM,rideHeight*PTM, 0,0, 0,1, frequency, damping, 0, motorTorque, true ); // rear
-	driveJoints[1] = game.physics.box2d.wheelJoint(truckBody.body, wheelBodies[1],  1.05*PTM,rideHeight*PTM, 0,0, 0,1, frequency, damping, 0, motorTorque, true ); // front
+	driveJoints[0] = game.physics.box2d.wheelJoint(truckBody,ri, -0.82*PTM,rideHeight*PTM, 0,0, 0,1, frequency, damping, 0, motorTorque, true ); // rear
+	driveJoints[1] = game.physics.box2d.wheelJoint(truckBody,rd,  1.05*PTM,rideHeight*PTM, 0,0, 0,1, frequency, damping, 0, motorTorque, true ); // front
 
 	cursors = game.input.keyboard.createCursorKeys();
 	
@@ -204,12 +229,12 @@ vbtci.events.onInputUp.add(vbtci_onup, this);
 
 
 
-	var motorSpeed = 00; // rad/s
+	var motorSpeed = 0; // rad/s
 	var motorEnabled = true;
 
 function update() {
 	
-
+//wheelBodies[1].sprite.x= wheelBodies[1].bodyDef.x;//,wheelBodies[1].bodyDef.y
 	
 	/*if (cursors.down.isDown) { motorSpeed = 0; te(11)} // prioritize braking
 	else if (cursors.left.isDown && !cursors.right.isDown) { motorSpeed *= -1; }
