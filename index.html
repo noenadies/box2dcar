@@ -1,0 +1,280 @@
+<!doctype html>
+<html>
+    
+<!-- Mirrored from examples.phaser.io/embed.php?f=box2d/car+on+terrain.js&v=2.2.2.box2d by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 02 Nov 2018 04:09:24 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+        <meta charset="UTF-8" />
+        <title>Phaser Example Runner</title>
+        <meta name="viewport" content="initial-scale=1 maximum-scale=1 user-scalable=0 minimal-ui" />
+ 
+        <script src="phaser.2.2.2.box2d.min.js" type="text/javascript"></script>
+      
+        <style>
+            body {width: 100%;
+            	height: 100%;
+                margin: 0px;
+                padding: 0px;
+                font-family: Arial;
+                font-size: 14px;
+                background-color: #000000;
+                color: #fff;
+            }
+            #idtext{
+z-index: 3;
+position: absolute;
+top: 90px;
+left: 15px;
+
+
+            }
+
+
+            #phaser-example{
+z-index: 2;
+
+  width: 100%;
+            	height: 100%;          }
+        </style>
+    </head>
+    <body>
+        <div id="phaser-example"></div>
+<p id="idtext">ooooo</p>
+        <script type="text/javascript">
+
+        var IDE_HOOK = false;
+        var VERSION = '2.2.2.box2d';
+
+    var vw = window.innerWidth;
+var vh = window.innerHeight;    
+var game = new Phaser.Game(vw, vh, Phaser.CANVAS, 'phaser-example', { preload: preload,create: create, update: update, render: render });
+var dm=100;
+var groundVertices =
+
+[-2492,-15,631,-4,828,-228,];
+
+var truckVertices = [-0.941074,-7.13798,-69.9798,-7.91197,-73.1929,8.39935,-68.3795,12.8165,-57.3861,13.1711,
+-48.8751,3.47799,-35.3993,2.53232,-23.1057,14.7078,34.2254,15.6535,45.2188,3.8326,
+59.8766,3.8326,67.2056,10.2159,71.7627,9.80711,72.9977,1.35024,69.3556,-5.51562,
+34.5293,-7.36343,21.802,-21.4563,1.15879,-21.9506];
+
+var otro=
+
+[-73.9998779296875,9.16650390625,68.0001220703125,-16.83349609375,75.0001220703125,-0.83349609375,63.0001220703125,-3.83349609375,45.0001220703125,-4.83349609375,39.0001220703125,7.16650390625,12.0001220703125,15.16650390625,-18.9998779296875,19.16650390625,-29.9998779296875,11.16650390625,-39.9998779296875,11.16650390625,-55.9998779296875,16.16650390625,-58.9998779296875,26.16650390625,-70.9998779296875,23.16650390625,];
+
+function te(st){
+document.getElementById("idtext").innerHTML =st;
+}
+
+var truckBody;
+var driveJoints = [];
+
+
+function preload() {
+
+    game.load.image('btcd', 'cd.png');    game.load.image('tire', 'tire.png');
+ game.load.image('truck', 'truck.png');
+
+ game.load.image('suelo','suelo.png');
+
+
+
+}
+
+
+
+
+function  hacerbody(sp,fo){
+sp.anchor.set(0.5);
+sp.scale.set(0.53);
+game.physics.box2d.enable(sp);
+sp.body.setPolygon(fo);
+return sp;
+}
+
+
+function create() {
+	
+	game.world.setBounds(-10000, -10000, 20000, 20000);
+	
+	game.stage.backgroundColor = '#124184';
+
+	// Enable Box2D physics
+	game.physics.startSystem(Phaser.Physics.BOX2D);
+
+	game.physics.box2d.gravity.y = 500;
+	game.physics.box2d.friction = 0.8;
+	
+	
+	// Make the ground body
+	//var groundBody = new Phaser.Physics.Box2D.Body(this.game, null, 0, 200, 0);
+	//groundBody.setChain(groundVertices);
+	
+	var PTM = 50;
+	
+	// Make the truck body
+	//truckBody = new Phaser.Physics.Box2D.Body(this.game, null, 0, -1*PTM);
+	//truckBody.setPolygon(truckVertices);
+		
+suelo = game.add.sprite(55, 300, 'suelo');
+suelo.anchor.set(0.5);
+
+suelo.scale.set(1,0.2);
+
+game.physics.box2d.enable(suelo);
+//suelo.body.setPolygon(groundVertices);
+suelo.body.static = true;
+truckBody = game.add.sprite(49, 0, 'truck');
+/*truckBody.scale.set(0.53);
+game.physics.box2d.enable(truckBody);
+truckBody.body.setPolygon(otro);*/
+
+
+
+hacerbody(truckBody,otro);
+	// Make the wheel bodies
+	var wheelBodies = [];
+	wheelBodies[0] = new Phaser.Physics.Box2D.Body(this.game, null, -0.82*PTM, 0.6*-PTM);
+	wheelBodies[1] = new Phaser.Physics.Box2D.Body(this.game, null,  1.05*PTM, 0.6*-PTM);
+	wheelBodies[0].setCircle(0.3*PTM);
+	wheelBodies[1].setCircle(0.3*PTM);
+		wheelBodies[0].sprite =game.add.sprite(0, 0, 'tire');
+			wheelBodies[1].sprite=game.add.sprite(0, 30, 'tire');
+			wheelBodies[1].sprite.scale.set(0,46);wheelBodies[0].sprite.scale.set(0,46);
+	var frequency = 3.5;
+	var damping = 0.5;	
+	var motorTorque = 2;
+	var rideHeight = 0.5;
+	
+	// Make wheel joints
+	// bodyA, bodyB, ax, ay, bx, by, axisX, axisY, frequency, damping, motorSpeed, motorTorque, motorEnabled	
+	driveJoints[0] = game.physics.box2d.wheelJoint(truckBody.body, wheelBodies[0], -0.82*PTM,rideHeight*PTM, 0,0, 0,1, frequency, damping, 0, motorTorque, true ); // rear
+	driveJoints[1] = game.physics.box2d.wheelJoint(truckBody.body, wheelBodies[1],  1.05*PTM,rideHeight*PTM, 0,0, 0,1, frequency, damping, 0, motorTorque, true ); // front
+
+	cursors = game.input.keyboard.createCursorKeys();
+	
+	game.camera.follow(truckBody);
+	
+	var caption = game.add.text(5, 5, 'Simple car control. Left/right arrow keys to move, down arrow key to brake.', { fill: '#ffffff', font: '14pt Arial' });
+	caption.fixedToCamera = true;
+
+
+
+vbtcd= game.add.sprite(vw/2, vh/2+vh/2*0.4, 'btcd');
+vbtcd.anchor.set(0.5);
+ vbtcd.fixedToCamera = true;
+
+  vbtcd.inputEnabled = true;
+ vbtcd.input.useHandCursor = true;
+
+
+
+vbtci= game.add.sprite(vw/2-vw*0.2, vh/2+vh/2*0.4, 'btcd');
+vbtci.anchor.set(0.5);
+vbtci.rotation=Math.PI;
+ vbtci.fixedToCamera = true;
+
+
+
+  vbtci.inputEnabled = true;
+ vbtci.input.useHandCursor = true;
+
+
+
+
+
+/*
+vbtci.events.onInputOver.add(vbtci_onOver, this);
+vbtci.events.onInputOut.add(vbtci_onOut, this);
+vbtcd.events.onInputOver.add(vbtcd_onOver, this);
+vbtcd.events.onInputOut.add(vbtcd_onOut, this);
+*/
+vbtcd.events.onInputDown.add(vbtcd_onDown, this);
+
+vbtcd.events.onInputUp.add(vbtcd_onup, this);
+vbtci.events.onInputDown.add(vbtci_onDown, this);
+
+vbtci.events.onInputUp.add(vbtci_onup, this);
+
+}
+
+ var vbtcd; var vbtci;
+
+
+
+
+
+	var motorSpeed = 00; // rad/s
+	var motorEnabled = true;
+
+function update() {
+	
+
+	
+	/*if (cursors.down.isDown) { motorSpeed = 0; te(11)} // prioritize braking
+	else if (cursors.left.isDown && !cursors.right.isDown) { motorSpeed *= -1; }
+    else if (cursors.right.isDown && !cursors.left.isDown) {  }
+	else { motorEnabled = false; te("no")} // roll if no keys pressed
+	*/
+	fquehace();
+	for (var i = 0; i < 2; i++) {
+		driveJoints[i].EnableMotor(motorEnabled);
+		driveJoints[i].SetMotorSpeed(motorSpeed);
+	}
+}
+
+function render() {
+//game.debug.box2dWorld('rgb(0,255,0)');
+
+}
+     
+var quehace=0;
+
+function fquehace(){
+if(quehace==1){
+	motorSpeed =250;
+te("dentro");
+}
+if(quehace==0){
+motorSpeed =0;
+	te("fuera");
+
+	//motorSpeed =0;
+}
+if(quehace==-1){
+	motorSpeed =-250;
+	te("atras");
+}
+
+}
+
+
+function vbtcd_onDown(){
+//motorSpeed =0;
+//quehace=1;
+
+quehace=1;
+}
+function vbtcd_onup(){
+quehace=0;
+
+}function vbtci_onDown(){
+//motorSpeed =0;
+//quehace=1;
+
+quehace=-1;
+}
+function vbtci_onup(){
+quehace=0;
+
+}
+
+
+
+
+        </script>
+
+    </body>
+
+<!-- Mirrored from examples.phaser.io/embed.php?f=box2d/car+on+terrain.js&v=2.2.2.box2d by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 02 Nov 2018 04:09:26 GMT -->
+</html>
