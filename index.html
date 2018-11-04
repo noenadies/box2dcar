@@ -47,7 +47,7 @@ z-index: 2;
 
     var vw = window.innerWidth;
 var vh = window.innerHeight;    
-var game = new Phaser.Game(vw, vh, Phaser.CANVAS, 'phaser-example', { preload: preload,create: create, update: update, render: render });
+var game = new Phaser.Game(vw, vh, Phaser.WEBGL, 'phaser-example', { preload: preload,create: create, update: update, render: render });
 var dm=100;
 
 
@@ -81,7 +81,7 @@ function preload() {
  game.load.image('truck', 'mc.png');
 
  game.load.image('suelo','suelo.png');
-
+    game.load.script('filter', 'Fire.js')
 
 
 }
@@ -100,6 +100,16 @@ return sp;
 var ri;
 var rd;
 function create() {
+
+
+
+
+
+
+
+
+
+
 	
 	game.world.setBounds(-10000, -10000, 20000, 20000);
 	
@@ -221,6 +231,26 @@ vbtci.events.onInputDown.add(vbtci_onDown, this);
 
 vbtci.events.onInputUp.add(vbtci_onup, this);
 
+
+
+
+
+	background = game.add.sprite(0, 0);
+	background.width = vw;
+	background.height = vh;
+
+	filter = game.add.filter('Fire', 800, 600);
+	filter.alpha = 0.0;
+
+	background.filters = [filter];
+
+
+background.fixedToCamera = true;
+
+
+
+
+
 }
 
  var vbtcd; var vbtci;
@@ -233,7 +263,7 @@ vbtci.events.onInputUp.add(vbtci_onup, this);
 	var motorEnabled = true;
 
 function update() {
-	
+		filter.update();
 //wheelBodies[1].sprite.x= wheelBodies[1].bodyDef.x;//,wheelBodies[1].bodyDef.y
 	
 	/*if (cursors.down.isDown) { motorSpeed = 0; te(11)} // prioritize braking
