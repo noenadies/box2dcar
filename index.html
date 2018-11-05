@@ -47,19 +47,22 @@ z-index: 2;
 
     var vw = window.innerWidth;
 var vh = window.innerHeight;    
-var game = new Phaser.Game(vw, vh, Phaser.WEBGL, 'phaser-example', { preload: preload,create: create, update: update, render: render });
+var game = new Phaser.Game(vw, vh, Phaser.CANVAS, 'phaser-example', { preload: preload,create: create, update: update, render: render });
 var dm=100;
 
 
 var wheelBodies = [];
 var groundVertices =
 
-[-2492,-15,631,-4,828,-228,];
+[-2500,53.4000244140625,-2103,-66.5999755859375,-2094,-89.5999755859375,-1938,-92.5999755859375,-1620,34.4000244140625,-927,133.4000244140625,-718,170.4000244140625,-265,176.4000244140625,-54,117.4000244140625,119,155.4000244140625,321,163.4000244140625,527,118.4000244140625,870,3.4000244140625,1095,-90.5999755859375,1511,-84.5999755859375,1564,150.4000244140625,2174,160.4000244140625,2475,160.4000244140625,2462,-49.5999755859375,2486,-49.5999755859375,2491,230.4000244140625,-2500,232.4000244140625,-2492,53.4000244140625,];
 
-var truckVertices = [-0.941074,-7.13798,-69.9798,-7.91197,-73.1929,8.39935,-68.3795,12.8165,-57.3861,13.1711,
+var truckVertices =
+
+[-56.9998779296875,21,-66.9998779296875,22,-69.9998779296875,15,-69.9998779296875,-3,67.0001220703125,-5,71.0001220703125,17,64.0001220703125,22,59.0001220703125,12,53.0001220703125,7,44.0001220703125,8,39.0001220703125,10,36.0001220703125,13,35.0001220703125,20,-24.9998779296875,20,-33.9998779296875,8,-42.9998779296875,2,-48.9998779296875,6,-54.9998779296875,14,];
+/* [-0.941074,-7.13798,-69.9798,-7.91197,-73.1929,8.39935,-68.3795,12.8165,-57.3861,13.1711,
 -48.8751,3.47799,-35.3993,2.53232,-23.1057,14.7078,34.2254,15.6535,45.2188,3.8326,
 59.8766,3.8326,67.2056,10.2159,71.7627,9.80711,72.9977,1.35024,69.3556,-5.51562,
-34.5293,-7.36343,21.802,-21.4563,1.15879,-21.9506];
+34.5293,-7.36343,21.802,-21.4563,1.15879,-21.9506];*/
 
 var truckBody;
 var driveJoints = [];
@@ -80,8 +83,8 @@ function preload() {
      game.load.image('tire', 'tire.png');
  game.load.image('truck', 'mc.png');
 
- game.load.image('suelo','suelo.png');
-    game.load.script('filter', 'Fire.js')
+ game.load.image('suelo','sn.png');
+
 
 
 }
@@ -100,16 +103,6 @@ return sp;
 var ri;
 var rd;
 function create() {
-
-
-
-
-
-
-
-
-
-
 	
 	game.world.setBounds(-10000, -10000, 20000, 20000);
 	
@@ -129,10 +122,10 @@ function create() {
 suelo = game.add.sprite(55, 300, 'suelo');
 suelo.anchor.set(0.5);
 
-suelo.scale.set(1,0.2);
+suelo.scale.set(1);
 
 game.physics.box2d.enable(suelo);
-//suelo.body.setPolygon(groundVertices);
+suelo.body.setPolygon(groundVertices);
 suelo.body.static = true;
 
 
@@ -231,26 +224,6 @@ vbtci.events.onInputDown.add(vbtci_onDown, this);
 
 vbtci.events.onInputUp.add(vbtci_onup, this);
 
-
-
-
-
-	background = game.add.sprite(0, 0);
-	background.width = vw;
-	background.height = vh;
-
-	filter = game.add.filter('Fire', 800, 600);
-	filter.alpha = 0.0;
-
-	background.filters = [filter];
-
-
-background.fixedToCamera = true;
-
-
-
-
-
 }
 
  var vbtcd; var vbtci;
@@ -263,7 +236,7 @@ background.fixedToCamera = true;
 	var motorEnabled = true;
 
 function update() {
-		filter.update();
+	
 //wheelBodies[1].sprite.x= wheelBodies[1].bodyDef.x;//,wheelBodies[1].bodyDef.y
 	
 	/*if (cursors.down.isDown) { motorSpeed = 0; te(11)} // prioritize braking
@@ -279,7 +252,7 @@ function update() {
 }
 
 function render() {
-//game.debug.box2dWorld('rgb(0,255,0)');
+game.debug.box2dWorld('rgb(0,255,0)');
 
 }
      
