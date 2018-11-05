@@ -123,7 +123,7 @@ function preload() {
 
  game.load.image('suelo','sn.png');
 
-
+ game.load.image('lnd','lnd.jpg');
 
 }
 
@@ -186,6 +186,9 @@ function create() {
 	// Make the ground body
 	var groundBody = new Phaser.Physics.Box2D.Body(this.game, null, 0, 0, 0);
 	groundBody.setChain(groundVertices);
+	var  fondo=  game.add.sprite(0,0,"lnd");
+	fondo.scale.set(vw/2560,vh/1600);
+	fondo.fixedToCamera=true;
 
 	//groundBody.sprite=game.add.sprite(groundBody.bodyDef.position.x-3500, groundBody.bodyDef.position.y-200, 'suelo');
 
