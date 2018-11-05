@@ -55,9 +55,23 @@ z-index: 2;
 
   width: 100%;
             	height: 100%;          }
+            	#idbt{
+
+            		position: absolute;
+            		top: 12px;
+            		left: 370px;
+            	}
+
+            		#idbt2{
+
+            		position: absolute;
+            		top: 12px;
+            		left: 370px;
+            	}
         </style>
     </head>
-    <body>
+    <body><button id="idbt" onclick="iniciatodo()">inicio</button>
+    	<button id="idbt2" onclick="pareload()">reload</button>
         <div id="phaser-example"></div>
 <p id="idtext">ooooo</p>
         <script type="text/javascript">
@@ -112,6 +126,27 @@ function preload() {
 
 
 }
+
+
+
+function pareload(){location.reload();}
+
+
+function iniciatodo(){
+
+
+	truckBody.x=0;
+	truckBody.y=90;
+	rd.x=0;
+	ri.y=-44;
+	ri.x=0;
+	rd.y=-44;
+	
+}
+
+
+
+
 
 
 
