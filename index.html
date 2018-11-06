@@ -109,6 +109,8 @@ var otro=
 
 [-73.9998779296875,9.16650390625,68.0001220703125,-16.83349609375,75.0001220703125,-0.83349609375,63.0001220703125,-3.83349609375,45.0001220703125,-4.83349609375,39.0001220703125,7.16650390625,12.0001220703125,15.16650390625,-18.9998779296875,19.16650390625,-29.9998779296875,11.16650390625,-39.9998779296875,11.16650390625,-55.9998779296875,16.16650390625,-58.9998779296875,26.16650390625,-70.9998779296875,23.16650390625,];
 
+var pbarbol=[6,144.637451171875,0,104.637451171875,-30,66.637451171875,-96,82.637451171875,-129,47.637451171875,-68,-118.362548828125,29,-142.362548828125,95,-65.362548828125,135,-1.362548828125,101,71.637451171875,41,83.637451171875,24,150.637451171875,];
+
 function te(st){
 document.getElementById("idtext").innerHTML =st;
 }
@@ -124,6 +126,8 @@ function preload() {
  game.load.image('suelo','sn.png');
 
  game.load.image('lnd','lnd.jpg');
+
+  game.load.image('arbol','arbol.png');
 
 }
 
@@ -304,6 +308,23 @@ vbtcd.events.onInputUp.add(vbtcd_onup, this);
 vbtci.events.onInputDown.add(vbtci_onDown, this);
 
 vbtci.events.onInputUp.add(vbtci_onup, this);
+/*
+var varbol= game.add.sprite(vw/2,100,"arbol");
+varbol.anchor.set(0.5);
+game.physics.box2d.enable(varbol);
+varbol.body.static=true;
+varbol.body.setPolygon(pbarbol);
+*/
+
+	var arbBody = new Phaser.Physics.Box2D.Body(this.game, null, vw/2, 40-270, 0);
+	arbBody.setChain(pbarbol);
+	arbBody.sprite=game.add.sprite(arbBody.x-134,arbBody.y-150,"arbol");
+	arbBody.sprite.anchor.set(0.5);
+	arbBody.sprite.body=arbBody;
+	console.log(arbBody.x+"    "+arbBody.y);
+
+ //   ship.body.setCircle(42);  
+
 
 }
 
@@ -333,7 +354,7 @@ function update() {
 }
 
 function render() {
-//game.debug.box2dWorld('rgb(0,255,0)');
+game.debug.box2dWorld('rgb(0,255,0)');
 
 }
      
