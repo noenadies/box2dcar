@@ -316,7 +316,7 @@ varbol.body.static=true;
 varbol.body.setPolygon(pbarbol);
 */
 
-	var arbBody = new Phaser.Physics.Box2D.Body(this.game, null, vw/2, 40-270, 0);
+	var arbBody = new Phaser.Physics.Box2D.Body(this.game, null, truckBody.x+1200, 40-290, 0);
 	arbBody.setChain(pbarbol);
 	arbBody.sprite=game.add.sprite(arbBody.x-134,arbBody.y-150,"arbol");
 	arbBody.sprite.anchor.set(0.5);
